@@ -130,7 +130,7 @@ V základní verzi máme v tuto chvíli nainstalováno PHP v 7.2.14, MySQL 5,7 a
       webroot: web
       php: "7.0"
 
- Verze 7.0 je v uvozovkách, protože YAML by to bez uvozovek přeložil jako 7 a Lando by se nespustilo. Pro verzi 7.1 to můžete nechat bez uvozovek.
+ Verze 7.0 je v uvozovkách, protože YAML by to bez uvozovek přeložil jako 7 a Lando by se nespustilo. Pro verzi 7.1 to můžete nechat bez uvozovek. Aktualizace: V novějších verzích by to už mělo být opraveno a uvozovky nejsou nutné.
  
  Stejně tak je možné konfigurovat i další věci, např. verzi MySQL,
 
