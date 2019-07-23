@@ -320,6 +320,19 @@ Není to příliš běžné, že by vývojář neměl nainstalovaný editor, ale
           command: "node /cloud9/server.js -p 80 -l 0.0.0.0 -w /app -a :"
 
 
+## Případ 12: Chci mít zachovanou historii příkazů v kontejneru
+
+Po restartu Landa, resp. po novém startu docker kontejneru zmizí historie příkazů, které po připojení přes `lando ssh` do kontejneru zapíšete. Následující trik namapuje historii do souboru `.appserver_bash_history.txt` v adresáři projektu.
+
+    services:
+      appserver:
+        overrides:
+          volumes:
+            - .appserver_bash_history.txt:/var/www/.bash_history
+          environment:
+            PROMPT_COMMAND: "history -a"
+
+
 # Předzávěr
 
 A kdyby toto vše, co je přednastaveno v receptech a v základních konfiguracích někomu nestačilo, vždy je možné jít o úroveň níže, vytvořit vlastní docker-compose.yml a předat ho Landu. Zájemce o více informací odkazuji na [dokumentaci.](https://docs.devwithlando.io/)
