@@ -304,6 +304,22 @@ Za druhé si ukážeme tooling, což je způsob, jak definovat vlastní příkaz
 Pro kontrolu PHP kódu pak stačí jen zavolat:
 
     lando phpcs cesta_k_souboru_či_adresáři
+    
+
+## Případ 11: Potřebujeme programátorský editor (IDE) bez instalace
+
+Není to příliš běžné, že by vývojář neměl nainstalovaný editor, ale např. při školení se to stát může. V takovém případě stačí přidat následující službu, která promění internetový prohlížeč na portu 8081 v profesionální editor pro programátory. Port si můžeme samozřejmě změnit.
+
+    services:
+      ide:
+        type: compose
+        services:
+          image: martinklima/cloud9-with-codeintel:1.0
+          ports:
+           - '8081:80'
+          command: "node /cloud9/server.js -p 80 -l 0.0.0.0 -w /app -a :"
+
+
 # Předzávěr
 
 A kdyby toto vše, co je přednastaveno v receptech a v základních konfiguracích někomu nestačilo, vždy je možné jít o úroveň níže, vytvořit vlastní docker-compose.yml a předat ho Landu. Zájemce o více informací odkazuji na [dokumentaci.](https://docs.devwithlando.io/)
