@@ -342,6 +342,3 @@ A kdyby toto vše, co je přednastaveno v receptech a v základních konfigurac�
 
 Tento článek obsahuje moji přednášku z Drupal setkání navazujícího na Drupal trénink v únoru roku 2019. Je volným pokračováním o rok starší přednášky a článku [Lando - vývojové protředí s Dockerem pro normální lidi](https://www.drupal.cz/clanky/lando-vyvojove-protredi-s-dockerem-pro-normalni-lidi). Reflektuje rozsáhlé změny mezi verzemi RC1 a RC2 a tedy oproti staršímu článku odpovídá realitě prvního čtvrtletí roku 2019.
 
-Věřím, že tento článek bude mít pokračování a aktualizace a bude obsahovat obohacující kusy receptů od čtenářů. Pomáhejte aktualizovat a rozšiřovat tento článek o další ukázky, které ve vašem týmu či při vývoju používáte. Článek je pro vás k dispozici na https://github.com/martin-klima/lando-recipes-article ve formátu Markdown. Budu ho průběžně přenášet na Drupal.cz.
-
-
