@@ -305,7 +305,22 @@ Pro kontrolu PHP kódu pak stačí jen zavolat:
 
     lando phpcs cesta_k_souboru_či_adresáři
     
-## Případ 11: Chci mít zachovanou historii příkazů v kontejneru
+
+## Případ 11: Potřebujeme programátorský editor (IDE) bez instalace
+
+Není to příliš běžné, že by vývojář neměl nainstalovaný editor, ale např. při školení se to stát může. V takovém případě stačí přidat následující službu, která promění internetový prohlížeč na portu 8081 v profesionální editor pro programátory. Port si můžeme samozřejmě změnit.
+
+    services:
+      ide:
+        type: compose
+        services:
+          image: martinklima/cloud9-with-codeintel:1.0
+          ports:
+           - '8081:80'
+          command: "node /cloud9/server.js -p 80 -l 0.0.0.0 -w /app -a :"
+
+
+## Případ 12: Chci mít zachovanou historii příkazů v kontejneru
 
 Po restartu Landa, resp. po novém startu docker kontejneru zmizí historie příkazů, které po připojení přes `lando ssh` do kontejneru zapíšete. Následující trik namapuje historii do souboru `.appserver_bash_history.txt` v adresáři projektu.
 
