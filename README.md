@@ -6,6 +6,4 @@ Klikněte na odkaz na článek níže a editujte, rozšiřujte článek o vaše 
 
 https://github.com/martin-klima/lando-recipes-article/blob/master/Lando-kdyz_recept_nestaci.md
 
-Změny budu průběžně přenášet na Drupal.cz.
-
 Díky.
