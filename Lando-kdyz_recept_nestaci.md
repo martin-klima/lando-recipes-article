@@ -339,7 +339,7 @@ Mít trvale zapnutý Xdebug znamená mít trvale pomalejší PHP. Proto je dobr�
 
 Pro nginx:
 
-```
+```yaml
 tooling:
   xdebug-on:
     service: appserver
@@ -354,7 +354,7 @@ tooling:
 ```
 
 Pro Apache:
-```
+```yaml
 tooling:
   xdebug-on:
     service: appserver
@@ -368,6 +368,31 @@ tooling:
     user: root
 
 ```
+
+# Případ 14: Potřebuji z PHP komunikovat s Microsoft SQL serverem
+
+PHP standardně neobsahuje rozšíření pro MS SQL server. Zde je postup, jak nainstalovat PHP extensions `pdo_sqlsrv` a `sqlsrv` do PHP 7.2.
+
+```yaml
+services:
+  appserver:
+    type: php:7.2
+    overrides:
+      environment:
+        ACCEPT_EULA: "Y"
+    build_as_root:
+      - apt-get update -y
+      - apt-get install apt-transport-https -y
+      - curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
+      - curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list > /etc/apt/sources.list.d/mssql-release.list
+      - apt-get update -y
+      - apt-get install msodbcsql17 -y
+      - apt-get install unixodbc-dev -y
+      - pecl install sqlsrv
+      - pecl install pdo_sqlsrv
+      - docker-php-ext-enable sqlsrv
+      - docker-php-ext-enable pdo_sqlsrv
+``` 
 
 # Předzávěr
 
