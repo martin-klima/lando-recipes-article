@@ -333,6 +333,42 @@ Po restartu Landa, resp. po novém startu docker kontejneru zmizí historie př�
             PROMPT_COMMAND: "history -a"
 
 
+## Případ 13: Chci rychle zapínat a vypínat Xdebug
+
+Mít trvale zapnutý Xdebug znamená mít trvale pomalejší PHP. Proto je dobré si ho zapnout, jen když je to potřeba. Zdroj tohoto nápadu je zde: https://github.com/lando/lando/issues/1668#issuecomment-507191275
+
+Pro nginx:
+
+```
+tooling:
+  xdebug-on:
+    service: appserver
+    description: Enable xdebug for nginx.
+    cmd: docker-php-ext-enable xdebug && pkill -o -USR2 php-fpm
+    user: root
+  xdebug-off:
+    service: appserver
+    description: Disable xdebug for nginx.
+    cmd: rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && pkill -o -USR2 php-fpm
+    user: root
+```
+
+Pro Apache:
+```
+tooling:
+  xdebug-on:
+    service: appserver
+    description: Enable xdebug for apache.
+    cmd: "docker-php-ext-enable xdebug && /etc/init.d/apache2 reload"
+    user: root
+  xdebug-off:
+    service: appserver
+    description: Disable xdebug for apache.
+    cmd: "rm /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && /etc/init.d/apache2 reload"
+    user: root
+
+```
+
 # Předzávěr
 
 A kdyby toto vše, co je přednastaveno v receptech a v základních konfiguracích někomu nestačilo, vždy je možné jít o úroveň níže, vytvořit vlastní docker-compose.yml a předat ho Landu. Zájemce o více informací odkazuji na [dokumentaci.](https://docs.devwithlando.io/)
