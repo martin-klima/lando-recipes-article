@@ -57,7 +57,7 @@ Dejme tomu, že máme chuť vyzkoušet si Drupal 8. Je to jednoduché. Založte 
      RECIPE    drupal8                                             
      DOCS      https://docs.devwithlando.io/tutorials/drupal8.html
 
-Recept zajistil, že máme kromě prostředí i užitečné příkazy. Ty z Drupal8 receptu jsou označeny tučně:
+Recept zajistil, že máme kromě prostředí i užitečné příkazy.
 
     $ lando
     Usage: lando <command> \[args\] [options]
@@ -271,7 +271,6 @@ Někdy máme projekt, který nepoužívá Grunt ani Gulp a cílem je konvertovat
         build: gem update --system && gem install sass compass bootstrap-sass breakpoint
            
 
-
 ## Případ 9: Potřebujeme Solr server
     services:
       solr:
@@ -283,6 +282,8 @@ Někdy máme projekt, který nepoužívá Grunt ani Gulp a cílem je konvertovat
             HTTPS_METHOD: redirect
         config:
           dir: config/solr
+
+
 ## Případ 10: Chceme mít kód podle standardů - PHP Code sniffer - phpcs
 
 V tompo případě si ukážeme dvě nové věci. Za prvé vytvoříme vlastní novou službu z vybraného existujícího image, který se nachází na Docker hubu (doposud jsme používali jen ty doporučené v Landu).  Službu pojmenujeme “phpcs” a dáme ji typ “compose”. Command “tail -f /dev/null” nikdy neskončí a udržuje tím container v chodu a naši službu aktivní.
@@ -294,7 +295,7 @@ V tompo případě si ukážeme dvě nové věci. Za prvé vytvoříme vlastní 
           image: willhallonline/drupal-phpcs:alpine
           command: tail -f /dev/null
 
-Za druhé si ukážeme tooling, což je způsob, jak definovat vlastní příkazy. Zde definujeme příkaz “phpcs”, předáváme ho i s jeho parametry složbě phpcs a spustíme ho tam jako uživatel root.
+Za druhé si ukážeme tooling, což je způsob, jak definovat vlastní příkazy. Zde definujeme příkaz “phpcs”, předáváme ho i s jeho parametry službě phpcs a spustíme ho tam jako uživatel root.
 
     tooling:
       phpcs:
@@ -331,6 +332,21 @@ Po restartu Landa, resp. po novém startu docker kontejneru zmizí historie př�
             - .appserver_bash_history.txt:/var/www/.bash_history
           environment:
             PROMPT_COMMAND: "history -a"
+
+Problém tohoto triku spočívá v tom, že je nutné, aby soubor `.appserver_bash_history.txt` existoval v hostitelském systému dříve, než spustíte Lando start nebo rebuild, jinak se vám vytvoří adresář s tímto názvem a nefunguje to.
+
+Zde je vylepšená verze, která funguje automaticky. Spočívá v tom, že se soubor s historií přesune do nového adresáře a ten se mapuje jako volume.
+
+```yaml
+services:
+  appserver:
+    overrides:
+      environment:
+        PROMPT_COMMAND: "history -a"
+        HISTFILE: /var/www/.history/hist.txt
+      volumes:
+        - ${PWD}/.history:/var/www/.history                                               
+```
 
 
 ## Případ 13: Chci rychle zapínat a vypínat Xdebug
