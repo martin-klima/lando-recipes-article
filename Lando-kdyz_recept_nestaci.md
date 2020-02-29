@@ -239,9 +239,9 @@ Adresa na webové rozhraní Mailhogu se objevila po dokončení příkazu:
 
     lando start
 
-nebo ji najdeme přes:
+nebo ji najdeme přes `lando info`, nebo ještě lépe s definicí služby, která nás zajímá:
 
-    lando info
+    lando info -s mailhog
 
 
 ## Případ 6: Je libo PhpMyAdmin?
@@ -409,6 +409,113 @@ services:
       - docker-php-ext-enable sqlsrv
       - docker-php-ext-enable pdo_sqlsrv
 ``` 
+
+# Případ 15: Chci používat své oblíbené bash aliasy i v kontejneru appserveru
+
+Část vývojářů posílá do služby appserver příkazy přes příkaz lando, jako např.
+`lando drush status`. Já patřím mezi tu skupinu, která si na začátku práce otevře terminál a příkazem
+`lando ssh`, případně `lando ssh -s <název služby>` si otevře příkazový řádek přímo v konkrétní službě a píše příkazy tam jako např.
+`drush status`. Je to pro mě pohodlnější a rychlejší.
+
+K dobré efektivitě patří zažité zkratky prostřednictvím aliasů, které je otravné nastavovat znovu a znovu po každém rebuildu služby.
+Zde je návod, jak to udělat, aby si kontejner služby načetl připravený soubor s definicemi aliasů.
+
+```yaml
+services:
+  appserver:
+    build:
+      # Load custom alias definitions from .lando/aliases/.bash_aliases file.
+     - /bin/sh -c "echo 'if [ -f /app/.lando/aliases/.bash_aliases ]; then . /app/.lando/aliases/.bash_aliases; fi' > ~/.bashrc"
+```
+Vychytávka vytvoří soubor .bashrc, který se po vytvoření kontejneru služby automaticky spustí.
+Ten obsahuje test, zda existuje soubor s aliasy (v našem případě .lando/aliases/.bash_aliases)
+a pokud ano, pak něj spustí, a tím nahraje do systému požadované aliasy.
+
+Pokud se rozhodnete soubor s aliasy během práce aktualizovat, stačí upravit váš soubor s aliasy a aktualizovat systém v kontejneru pomocí příkazu
+`source ~/.bashrc` nebo přes Lando jako `lando source ~/.bashrc` a je to.
+
+
+# Případ 16: Potřebuji v týmu používat více ini souborů s nastavením pro PHP
+
+Lando standardně podporuje pouze jeden konfigurační soubor pro PHP. Pokud potřebujete mít jeden config týmový a zároveň umožnit vývojářům,
+aby mohli používat vlastní, např. pro zapnutí Xdebug profileru, použijte následující vychytávku.
+
+```yaml
+
+services:
+  appserver:
+    overrides:
+      environment:
+        # Load custom php.ini files if exist in .lando/config/php directory.
+        PHP_INI_SCAN_DIR: "/usr/local/etc/php/conf.d:/app/.lando/config/php"
+```
+
+# Případ 17: Potřebuji aktivovat Xdebug profiler
+
+Do configu pro PHP přidejte následující řádky:
+
+```
+xdebug.profiler_enable=1
+xdebug.profiler_output_dir=/app/profiler
+```
+
+nebo mějte připravený soubor profiler.ini a umístěte ho do adresáře s PHP configy, viz případ 16.
+
+Nezapomeňte, že adresář pro profiler output musí existovat, takže je třeba ho předem vytvořit.
+
+Restartujte Xdebug, ideálně podle návodu v případu 13, tedy
+
+`lando xdebug-off; lando xdebug-on`
+
+Profiler bude nyní pro každé spuštění PHP generovat soubory, které lze pak načíst ve vizualizačních nástrojích,
+např. PSPstorm nebo KCacheGrind.
+
+
+# Připad 18: Změnila se mi IP adresa a přestal mi fungovat Xdebug a spojení s Hostem
+
+Vemi tento nepříjemný problém se stává pokud vývojář přejde z domova do kanceláře, nebo vytáhne ethernetový kabel
+a přejde z drátového internetu na bezdrátový.
+Hostitelskému počítači (počítač, kde se spouští Lando) se změní IP adresa a lecos přestane pracovat,
+především to, co je na IP adresu navázáno, jako např. Xdebug remote host, nebo spojení na SSH tunel.
+Řeší to následují příkaz:
+
+`export LANDO_HOST_IP=<newIP>; export XDEBUG_CONFIG="remote_enable=true remote_host=<newIP>"`
+
+Aby to bylo opravdu pohodlné, lze použít funkci, která se definuje stejně jako alias, s výhodou,
+že umí použít parametry.
+
+`function changeip() { export LANDO_HOST_IP=$1; export XDEBUG_CONFIG="remote_enable=true remote_host=$1"; }`
+
+Není pak nic jednoduššího, než se podívat, jaká je aktuální IP adresa hostitelského počítače a zadat např. příkaz:
+
+`lando changeip 10.0.0.1`
+
+Aby fungovaly i další Drupal nastavení automaticky, použijeme místo konkrétní IP adresy načtení hodnoty z env proměnné LANDO_HOST_IP.
+Jako příklad použijeme připojení dalších databází do Drupalu v settings.php.
+
+```php
+// Credential for data migration source from MS SQL server.
+$conf['mssql_source_connection'] = [
+  'database' => 'mssql_db',
+  'username' => 'sa',
+  'password' => 'supersecretpassword',
+  'servername' => getenv('LANDO_HOST_IP'),
+  'character_set' => "UTF-8",
+];
+
+// Credential for data migration source from MySQL server.
+$databases['source_database']['default'] = array(
+  'driver' => 'mysql',
+  'database' => 'old_db',
+  'username' => 'user',
+  'password' => 'password',
+  'host' => getenv('LANDO_HOST_IP'),
+  'port' => '3366',
+  'collation' => 'utf8_general_ci',
+);
+```
+
+
 
 # Předzávěr
 
